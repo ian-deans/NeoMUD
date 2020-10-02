@@ -1,10 +1,12 @@
 const Zone = require( './Zone' )
 
 class Game {
-    constructor({ isServer }) {
+    constructor( { isServer } ) {
         //common
         this.active = false
         this.upSince = new Date()
+        this.tickInterval = null
+        this.tickLength = 3000
 
         if ( isServer ) {
             this.playerList = {}
@@ -18,7 +20,7 @@ class Game {
         } )
     }
 
-    createZone( zoneData ) {
+    addZone( zoneData ) {
         if ( !zoneData ) {
             const message = 'must include zone data when creating a zone.'
             process.emit( 'error', { message } )
@@ -27,11 +29,20 @@ class Game {
 
         const zone = new Zone( zoneData )
         this.zones[ zone.uid ] = zone
+        return zone.uid
     }
 
     start() {
-        this.active = true;
-        
+        this.active = true
+        while ( active ) {
+            this.tickInterval = setInterval( function () {
+                process.emit( 'tick', { time: new Date() } )
+            }, tickLength )
+        }
+    }
+
+    getZones() {
+        return Object.values(this.zones)
     }
 }
 

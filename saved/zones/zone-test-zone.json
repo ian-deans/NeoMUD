@@ -1,0 +1,31 @@
+{
+    "uid": "c667f532-3776-409d-bdb1-3244cbb1a287",
+    "name": "Test Zone",
+    "rooms": [
+        {
+            "uid": "8ee6ad6d-75aa-412c-8981-f80e3f6a4d0d",
+            "title": "First Room",
+            "description": "You stand in a plain white room. There are no decorations of any kind.\n Looking around, the world seems incomplete. As if whatever has created this reality\n is still working on it.\n",
+            "exits": {
+                "NORTH": "a25d8a96-5d89-40ed-acfc-dddfb25cb077"
+            }
+        },
+        {
+            "uid": "a25d8a96-5d89-40ed-acfc-dddfb25cb077",
+            "title": "Second Room",
+            "description": "Another plain room",
+            "exits": {
+                "SOUTH": "8ee6ad6d-75aa-412c-8981-f80e3f6a4d0d",
+                "WEST": "aaba63b1-cee8-4b09-b787-1b51bea02353"
+            }
+        },
+        {
+            "uid": "aaba63b1-cee8-4b09-b787-1b51bea02353",
+            "title": "Room 3",
+            "description": "A dope ass room?",
+            "exits": {
+                "EAST": "a25d8a96-5d89-40ed-acfc-dddfb25cb077"
+            }
+        }
+    ]
+}

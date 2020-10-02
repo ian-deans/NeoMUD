@@ -1,16 +1,18 @@
-const {v4: uuid} = require("uuid")
-const EventEmitter = require('events');
+const { v4: uuid } = require( "uuid" )
+const EventEmitter = require( 'events' )
 
 class Room {
-    constructor({uid, title, description}) {
-        this.uid = uid ? uid : uuid();
-        this.title = title;
-        this.description = description;
-        this.exits = {};
-        this.occupants = {};
-        this.Events = new EventEmitter();
+    constructor( { uid, title, description } ) {
+        this.uid = uid ? uid : uuid()
+        this.title = title
+        this.description = description
+        this.exits = {}
+        this.occupants = {}
+        this.objects = {}
+        this.events = new EventEmitter()
 
-        this.getOccupants = this.getOccupants.bind(this);
+        this.getOccupants = this.getOccupants.bind( this )
+
     }
 
     info() {
@@ -18,7 +20,9 @@ class Room {
             uid: this.uid,
             title: this.title,
             description: this.description,
-            exits: Object.keys(this.exits)
+            exits: Object.keys( this.exits ),
+            occupants: Object.values( this.occupants ),
+            objects: Object.values( this.objects ),
         }
     }
 
@@ -26,8 +30,10 @@ class Room {
         // Add listeners for: say, event, 
     }
 
-    addOccupant() {
+    addOccupant( actor ) {
         // takes an actor object as argument and adds to occupants hashmap
+        this.occupants[ actor.uid ] = actor
+
     }
 
     removeOccupant() {
@@ -41,29 +47,29 @@ class Room {
         // TODO: Dont mutate data
     }
 
-    connect({direction, room}) {
+    connect( { direction, room } ) {
         // if valid direction
-        this.exits[direction] = room;
+        this.exits[ direction ] = room
     }
 
-    getNext(direction) {
-        return this.exits[direction];
+    getNext( direction ) {
+        return this.exits[ direction ]
     }
 
-    setTitle(content) {
-        this.title = content;
+    setTitle( content ) {
+        this.title = content
     }
 
-    updateDescription(content) {
-        this.description = content;
+    updateDescription( content ) {
+        this.description = content
     }
 
     exportJSON() {
-        const { uid, title, description, exits } = this;
+        const { uid, title, description, exits } = this
         const exitJSONS = {}
-        Object.keys(exits).forEach(direction => {
-            exitJSONS[direction] = exits[direction].uid
-        })
+        Object.keys( exits ).forEach( direction => {
+            exitJSONS[ direction ] = exits[ direction ].uid
+        } )
         return { uid, title, description, exits: exitJSONS }
     }
 
@@ -73,9 +79,9 @@ class Room {
 
 }
 
-module.exports = Room;
+module.exports = Room
 
 /**
  * have title, descriptions, list of occupants, list of exits,
- * 
+ *
  */

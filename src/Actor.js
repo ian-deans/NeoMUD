@@ -1,12 +1,12 @@
-const {v4: uuid} = require('uuid');
+const { v4: uuid } = require( 'uuid' )
 
 class Actor {
-    constructor({name}) {
-        this.uid = uuid();
-        this.name = name;
-        this.shortDescription = null;
-        this.longDescription = null;
-        this.location = null;
+    constructor( { name, shortDescription, longDescription } ) {
+        this.uid = uuid()
+        this.name = name
+        this.shortDescription = shortDescription
+        this.longDescription = longDescription
+        this.location = null
 
         this.hp = {
             current: 10,
@@ -15,25 +15,17 @@ class Actor {
 
     }
 
-    updateLocation(room) {
-        this.location = room;
+    updateLocation( room ) {
+        this.location = room
     }
 
     getLocation() {
-        return this.location;
+        return this.location
+    }
+
+    say( content ) {
+        this.location.events.emit( 'say', { speaker: this.uid, content } )
     }
 }
 
-
-class Player extends Actor {
-    constructor({name}) {
-        super({name});
-    }
-
-
-    look() {
-
-    }
-
-
-}
+module.exports = Actor

@@ -1,19 +1,14 @@
 const { v4: uuid } = require( 'uuid' )
+const fs = require( 'fs' )
 const Room = require( './Room' )
 
-const directions = {
-    NORTH: 'NORTH',
-    EAST: 'EAST',
-    SOUTH: 'SOUTH',
-    WEST: 'WEST',
-}
+const directions = require( '../constants/directions' )
 
 class Zone {
     constructor( { uid, name, rooms } ) {
         this.uid = uid ? uid : uuid()
         this.name = name
         this.players = {}
-        // this.startRoom = null
         // this.currentRoom = null
         this.rooms = rooms ? this.loadRooms( rooms ) : {}
 
@@ -30,13 +25,13 @@ class Zone {
          * zone events
          * player_enters, player_leaves, yell
          */
-        process.on('zone_player_enters', ({zoneUid, playerUid }) => {
-            if (zoneUid !== this.uid) {
+        process.on( 'zone_player_enters', ( { zoneUid, playerUid } ) => {
+            if ( zoneUid !== this.uid ) {
                 return
             }
 
 
-        })
+        } )
     }
 
     addRoom( { title, description, direction } ) {
@@ -101,8 +96,11 @@ class Zone {
             rooms: roomJSONS,
         } )
     }
-    saveZone() {
+    save() {
         //TODO: write json data to file.
+        const fileName = `zone-${ this.name.replace( ' ', '-' ).toLowerCase() }.json`
+        const json = this.exportJSON()
+        fs.writeFileSync( fileName, json )
     }
 
     loadRooms( roomsData ) {
@@ -115,7 +113,6 @@ class Zone {
 
         // connect the rooms
         roomsData.forEach( roomData => {
-
             const currentRoom = rooms[ roomData.uid ]
             const directions = Object.keys( roomData.exits )
 
