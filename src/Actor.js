@@ -6,7 +6,10 @@ class Actor {
         this.name = name
         this.shortDescription = shortDescription
         this.longDescription = longDescription
-        this.location = null
+        this.location = {
+            zone: null,
+            room: null,
+        }
 
         this.hp = {
             current: 10,
@@ -15,8 +18,14 @@ class Actor {
 
     }
 
-    updateLocation( room ) {
-        this.location = room
+    updateLocation({ zone, room }) {
+        if (zone) {
+            this.location.zone = zone
+        }
+
+        if (room) {
+            this.location.room = room
+        }
     }
 
     getLocation() {
