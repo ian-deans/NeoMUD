@@ -1,4 +1,4 @@
-const Actor = require( './Actor' )
+const Actor = require( './Actor.ts' )
 
 class Player extends Actor {
     constructor( data ) {
@@ -28,6 +28,19 @@ class Player extends Actor {
 }
 
 module.exports = Player
+
+class Location {
+    constructor() {
+        this.zone
+        this.room
+
+
+    }
+
+    getUids() {
+        return { zone: this.zone.uid, room: this.room.uid } 
+    }
+}
 
 /**
  * player enters room

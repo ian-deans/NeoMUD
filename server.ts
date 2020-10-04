@@ -32,11 +32,7 @@ const player = new Player( doodData )
 player.updateLocation( firstRoom )
 firstRoom.addOccupant( player )
 
-const goblinData = {
-    name: 'a goblin',
-    shortDescription: 'a small green creature',
-    longDescription: 'A small, dirty looking, green-skinned creature is squatting nearby.',
-}
+const goblinData = 
 
 const goblin = new NPC( goblinData )
 
@@ -56,44 +52,44 @@ process.stdin.on( 'data', data => {
     const command = args.shift()
     const params = args.pop()
 
-    handleCommands( { command, params } )
+    // handleCommands( { command, params } )
 } )
 
 
 
 
-function handleCommands( { command, params } ) {
+// function handleCommands( { command, params } ) {
 
-    switch ( command ) {
-        case 'l':
-        case 'look': {
-            return player.look()
-        }
+//     switch ( command ) {
+//         case 'l':
+//         case 'look': {
+//             return player.look()
+//         }
 
-        case 'say': {
-            return console.log( `You say, "${ params }"` )
-        }
+//         case 'say': {
+//             return console.log( `You say, "${ params }"` )
+//         }
 
-        case 'exit': {
-            return process.exit()
-        }
+//         case 'exit': {
+//             return process.exit()
+//         }
 
-        case 'move': {
-            const direction = params.toUpperCase()
+//         case 'move': {
+//             const direction = params.toUpperCase()
 
-            if ( !DIRECTIONS[ direction ] ) {
-                process.emit( 'error', { message: 'Not a valid direction!' } )
-                return
-            }
+//             if ( !DIRECTIONS[ direction ] ) {
+//                 process.emit( 'error', { message: 'Not a valid direction!' } )
+//                 return
+//             }
 
-            player.move( direction )
-            console.log( `You walk ${ params }.` )
-            // lookInRoom()
-            return
-        }
+//             player.move( direction )
+//             console.log( `You walk ${ params }.` )
+//             // lookInRoom()
+//             return
+//         }
 
-        default: {
-            console.log( 'Shwhat?' )
-        }
-    }
-}
+//         default: {
+//             console.log( 'Shwhat?' )
+//         }
+//     }
+// }
