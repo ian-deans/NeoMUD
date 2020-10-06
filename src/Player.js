@@ -3,6 +3,7 @@ const Actor = require( './Actor.ts' )
 class Player extends Actor {
     constructor( data ) {
         super( data )
+        this.clientID = data.clientID;
     }
 
     look() {

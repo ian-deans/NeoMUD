@@ -1,42 +1,24 @@
-const { v4: uuid } = require( 'uuid' );
+const { v4: uuid } = require('uuid');
 const EventEmitter = require('events');
-
 class Actor {
-    uid: string;
-    name: string;
-    shortDescription: string;
-    longDescription: string;
-    location: Coordinates;
-
-    constructor( { uid, name, shortDescription, longDescription } ) {
-        this.uid = uid ? uid : uuid()
-        this.name = name
-        this.shortDescription = shortDescription
-        this.longDescription = longDescription
+    constructor({ uid, name, shortDescription, longDescription }) {
+        this.uid = uid ? uid : uuid();
+        this.name = name;
+        this.shortDescription = shortDescription;
+        this.longDescription = longDescription;
         // this.location = new Coordinates();
     }
-
-    updateLocation(coords: ICoordinates) {
+    updateLocation(coords) {
         // this.location.update(coords)
     }
-
     getLocation() {
-        return this.location
+        return this.location;
     }
-
-    say( content ) {
+    say(content) {
         // this.location.events.emit( 'say', { speaker: this.uid, content } )
     }
 }
-
-module.exports = Actor
-
-
-interface ICoordinates {
-    zoneUid: string;
-    roomUid: string;
-}
-
+module.exports = Actor;
 // Represents an item or actors location in the world.
 // the first value is the zone uid, and the second is the room uid
 //  Coordinates [ a4fd-24h3, b3a5-9f93 ] = [ zoneUid, roomUid ]
@@ -62,5 +44,5 @@ class Coordinates {
     }
 }
 */
-
 // game.zones[ coords[ 0 ] ].rooms[ coords[ 1 ]]
+//# sourceMappingURL=Actor.js.map
