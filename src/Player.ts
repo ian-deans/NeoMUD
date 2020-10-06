@@ -1,9 +1,14 @@
 const Actor = require( './Actor.ts' )
+import { Socket } from "net";
 
 class Player extends Actor {
-    constructor( data ) {
-        super( data )
-        this.clientID = data.clientID;
+    clientID: string;
+    socket: Socket | null;
+
+    constructor( {clientID, ...baseData} ) {
+        super(  baseData )
+        this.clientID = clientID;
+        this.socket = null;
     }
 
     look() {

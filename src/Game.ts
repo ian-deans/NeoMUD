@@ -1,6 +1,11 @@
 const Zone = require( './Zone' )
 
 class Game {
+    active: boolean;
+    tickLength: number;
+    thickInterval: Function;
+    
+
     constructor( { isServer } ) {
         //common
         this.active = false

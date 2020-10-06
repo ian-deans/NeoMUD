@@ -2,16 +2,17 @@ import express from 'express';
 import http from 'http';
 // import { server as WebSocketServer } from 'websocket';
 import WebSocket from 'ws';
+import Game from './src/Game';
 
-import { chat } from "./src/Channel"
+import { chat } from "./src/Channel";
 
-process.title = 'Game Alpha'
+process.title = 'Game Alpha';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer( app );
-const wss = new WebSocket.Server( { server } )
+const wss = new WebSocket.Server( { server } );
 
 const players = {
     "A1": {
@@ -34,7 +35,7 @@ const players = {
 wss.on( 'connection', connectClient )
 
 chat.on( 'chat', message => {
-    console.log('--> Chat event detected, sending to clients.')
+    console.log( '--> Chat event detected, sending to clients.' )
     wss.clients.forEach( client => {
         client.send( JSON.stringify( {
             scope: 'global',
@@ -106,7 +107,7 @@ function connectClient( ws ) {
         }
     } )
 
-    ws.on( 'message', data =>  handleIncomingData(data, ws) )
+    ws.on( 'message', data => handleIncomingData( data, ws ) )
 }
 
 server.listen( PORT, () => {

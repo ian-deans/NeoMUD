@@ -23,12 +23,12 @@ class Channel extends events.EventEmitter {
 const chatChannel = new Channel( 'chat' )
 
 
-chatChannel.send( "This is a chat message!" )
+// chatChannel.send( "This is a chat message!" )
 
-let count = 0;
-setInterval( function () {
-    chatChannel.send( 'Chat message ' + ++count )
-}, 5000 )
+// let count = 0;
+// setInterval( function () {
+//     chatChannel.send( 'Chat message ' + ++count )
+// }, 5000 )
 
 
 export const chat = chatChannel
