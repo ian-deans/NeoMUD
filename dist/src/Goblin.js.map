@@ -1,1 +1,0 @@
-{"version":3,"file":"Goblin.js","sourceRoot":"","sources":["../../src/Goblin.ts"],"names":[],"mappings":";;;;;AAAA,gDAAuB;AAEvB,MAAM,UAAU,GAAG;IACf,IAAI,EAAE,UAAU;IAChB,gBAAgB,EAAE,wBAAwB;IAC1C,eAAe,EAAE,qEAAqE;CACzF,CAAA;AAED,MAAM,MAAO,SAAQ,aAAG;IACpB;QACI,KAAK,CAAC,UAAU,CAAC,CAAA;IAIrB,CAAC;CACJ;AAED,kBAAe,MAAM,CAAA"}
