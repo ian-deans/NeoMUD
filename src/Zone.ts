@@ -1,19 +1,35 @@
-const { v4: uuid } = require( 'uuid' )
-const fs = require( 'fs' )
-const Room = require( './Room' )
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import Room from './Room';
+import { Directions } from '../constants/directions';
+import { directionOppositeOf } from '../util'
 
-const directions = require( '../constants/directions' )
 
-class Zone {
-    constructor( { uid, name, rooms } ) {
-        this.uid = uid ? uid : uuid()
+interface IZone {
+    uuid: string;
+    name: string;
+    rooms: any;
+}
+
+/**
+ * Maintains a collection of rooms
+ */
+
+export default class Zone {
+    uid: string;
+    name: string;
+    players: any;
+    rooms: any;
+
+    constructor( { uuid, name, rooms }: IZone ) {
+        this.uid = uuid ? uuid : uuidv4()
         this.name = name
         this.players = {}
         // this.currentRoom = null
         this.rooms = rooms ? this.loadRooms( rooms ) : {}
 
-        this.addRoom = this.addRoom.bind( this )
-        this.move = this.move.bind( this )
+        // this.addRoom = this.addRoom.bind( this )
+        // this.move = this.move.bind( this )
         this.loadRooms = this.loadRooms.bind( this )
     }
 
@@ -34,32 +50,27 @@ class Zone {
         } )
     }
 
-    addRoom( { title, description, direction } ) {
+    // addRoom( { title, description, direction } ) {
 
-        const room = new Room( { title, description } )
+    //     const room = new Room( { title, description } )
 
-        this.rooms[ room.uid ] = room
+    //     this.rooms[ room.uid ] = room
 
 
-        if ( !this.startRoom ) {
-            this.startRoom = room
-            this.currentRoom = this.startRoom
-        } else {
-            if ( !direction ) {
-                process.emit( 'error', { message: 'Need a direction to create a new room' } )
-            }
-            room.connect( { direction: directionOppositeOf( direction ), room: this.currentRoom } )
-            this.currentRoom.connect( { direction, room } )
-        }
-    }
+    //     if ( !this.startRoom ) {
+    //         this.startRoom = room
+    //         this.currentRoom = this.startRoom
+    //     } else {
+    //         if ( !direction ) {
+    //             process.emit( 'error', { message: 'Need a direction to create a new room' } )
+    //         }
+    //         room.connect( { direction: directionOppositeOf( direction ), room: this.currentRoom } )
+    //         this.currentRoom.connect( { direction, room } )
+    //     }
+    // }
 
     addPlayer( player ) {
         this.players[ player.uid ] = player
-    }
-
-    move( direction ) {
-        const nextRoom = this.currentRoom.getNext( direction )
-        this.currentRoom = nextRoom
     }
 
     getRoom( uid ) {
@@ -67,8 +78,7 @@ class Zone {
 
         if ( !room ) {
             const message = `Can not find room with uid: ${ uid } in zone: ${ this.name }.`
-            process.emit( 'error', { message } )
-            return
+            throw new Error('message')
         }
     }
 
@@ -126,23 +136,3 @@ class Zone {
         return rooms
     }
 }
-
-function directionOppositeOf( direction ) {
-    switch ( direction ) {
-        case directions.NORTH: {
-            return directions.SOUTH
-        }
-        case directions.EAST: {
-            return directions.WEST
-        }
-        case directions.SOUTH: {
-            return directions.NORTH
-        }
-        case directions.WEST: {
-            return directions.EAST
-        }
-    }
-}
-
-
-module.exports = Zone

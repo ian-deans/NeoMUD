@@ -1,23 +1,46 @@
-const { v4: uuid } = require( "uuid" )
-const EventEmitter = require( 'events' )
+import { v4 as uuidv4 } from 'uuid'
+import { EventEmitter } from 'events'
+import Channel from './Channel'
 
-class Room {
-    constructor( { uid, title, description } ) {
-        this.uid = uid ? uid : uuid()
+interface IRoom {
+    uuid: string
+    title: string
+    description: string
+}
+
+/**
+ * Represents a single space within the world. A room can house players,
+ * NPCs, and items ( weapons, armor, furnirture ) and maintains an event
+ * emitter.
+ */
+
+export default class Room {
+    uuid: string
+    title: string
+    description: string
+    exits: any
+    occupants: any
+    objects: any
+    events: any
+    respawnPoints: any[]
+    say: any
+    
+    constructor( { uuid, title, description }: IRoom ) {
+        this.uuid = uuid ? uuid : uuidv4()
         this.title = title
         this.description = description
         this.exits = {}
         this.occupants = {}
         this.objects = {}
         this.events = new EventEmitter()
+        this.say = new Channel( 'say' )
 
         this.getOccupants = this.getOccupants.bind( this )
-
     }
 
     info() {
         return {
-            uid: this.uid,
+            uuid: this.uuid,
             title: this.title,
             description: this.description,
             exits: Object.keys( this.exits ),
@@ -32,8 +55,7 @@ class Room {
 
     addOccupant( actor ) {
         // takes an actor object as argument and adds to occupants hashmap
-        this.occupants[ actor.uid ] = actor
-
+        this.occupants[ actor.uuid ] = actor
     }
 
     removeOccupant() {
@@ -65,23 +87,11 @@ class Room {
     }
 
     exportJSON() {
-        const { uid, title, description, exits } = this
+        const { uuid, title, description, exits } = this
         const exitJSONS = {}
         Object.keys( exits ).forEach( direction => {
-            exitJSONS[ direction ] = exits[ direction ].uid
+            exitJSONS[ direction ] = exits[ direction ].uuid
         } )
-        return { uid, title, description, exits: exitJSONS }
+        return { uuid, title, description, exits: exitJSONS }
     }
-
-
-
-
-
 }
-
-module.exports = Room
-
-/**
- * have title, descriptions, list of occupants, list of exits,
- *
- */

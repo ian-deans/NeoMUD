@@ -1,34 +1,21 @@
-const events = require( 'events' )
+import { EventEmitter } from 'events'
 
-class Channel extends events.EventEmitter {
+
+export default class Channel extends EventEmitter {
+    private name: string
+
     constructor( name ) {
         super()
-        this.name = name;
+        this.name = name
     }
 
-    subscribe() {
-        return this.on( 'chat', function ( message ) {
-            return message;
-        } )
+    subscribe( cb ) {
+        return this.on( this.name, cb )
     }
 
     send( message ) {
-        this.emit( 'chat', message )
+        this.emit( this.name, message )
     }
 
 
 }
-
-
-const chatChannel = new Channel( 'chat' )
-
-
-// chatChannel.send( "This is a chat message!" )
-
-// let count = 0;
-// setInterval( function () {
-//     chatChannel.send( 'Chat message ' + ++count )
-// }, 5000 )
-
-
-export const chat = chatChannel

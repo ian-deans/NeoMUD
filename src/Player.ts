@@ -1,20 +1,28 @@
-const Actor = require( './Actor.ts' )
 import { Socket } from "net";
+import Actor from "./Actor";
 
-class Player extends Actor {
+/**
+ * Class that handles Players and how they can interact with the game.
+ * 
+ * two types of methods? for interaction via the websocket messages,
+ * websocket methods return a return message to send back to the client.
+ */
+
+export default class Player extends Actor {
     clientID: string;
     socket: Socket | null;
+    location: any;
 
-    constructor( {clientID, ...baseData} ) {
-        super(  baseData )
-        this.clientID = clientID;
+    constructor( data ) {
+        super( data );
+        this.clientID = data.clientID;
         this.socket = null;
     }
 
     look() {
         const { title, description, exits, occupants, objects } = this.location.info()
 
-        const roomOccupants = occupants.filter( occupant => occupant.uid !== this.uid )
+        const roomOccupants = occupants.filter( occupant => occupant.uid !== this.uuid )
         return console.log( `
  ${ title.toUpperCase() }
  ${ description }
@@ -26,33 +34,10 @@ class Player extends Actor {
     }
 
     move( direction ) {
-        const nextRoom = this.location.getNext( direction )
-        this.location.removeOccupant( this )
-        this.updateLocation( nextRoom )
-        this.location.addOccupant( this )
+        // const nextRoom = this.location.getNext( direction )
+        // this.location.removeOccupant( this )
+        // this.updateLocation( nextRoom )
+        // this.location.addOccupant( this )
     }
 }
 
-module.exports = Player
-
-class Location {
-    constructor() {
-        this.zone
-        this.room
-
-
-    }
-
-    getUids() {
-        return { zone: this.zone.uid, room: this.room.uid } 
-    }
-}
-
-/**
- * player enters room
- * room adds player
- */
-
-function handleSay( { speaker, content } ) {
-    console.log( `${ speaker } says, "${ content }"` )
-}

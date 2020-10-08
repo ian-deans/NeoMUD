@@ -1,10 +1,7 @@
 import express from 'express';
 import http from 'http';
-// import { server as WebSocketServer } from 'websocket';
 import WebSocket from 'ws';
 import Game from './src/Game';
-
-import { chat } from "./src/Channel";
 
 process.title = 'Game Alpha';
 
@@ -14,41 +11,25 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer( app );
 const wss = new WebSocket.Server( { server } );
 
-const players = {
-    "A1": {
-        uid: "A1",
-        name: "Ian",
-        roomID: "1A",
-        clientID: null,
-        socket: null,
-    },
-    "B1": {
-        uid: "B1",
-        name: "Guy",
-        roomID: "1A",
-        clientID: null,
-        socket: null,
-    },
+function serverMessageHandler( data ) {
+    if ( data.type === 'player-login' ) {
+        
+    }
 }
-
 
 wss.on( 'connection', connectClient )
 
-chat.on( 'chat', message => {
-    console.log( '--> Chat event detected, sending to clients.' )
-    wss.clients.forEach( client => {
-        client.send( JSON.stringify( {
-            scope: 'global',
-            type: 'communication',
-            content: message
-        } ) )
-    } )
-} )
-
-
 function handleIncomingData( data, ws ) {
+
     const parsedData = JSON.parse( data.toString() )
-    const { type, clientID } = JSON.parse( data.toString() );
+    const { scope, type, clientID } = JSON.parse( data.toString() );
+
+    switch ( scope ) {
+        case 'global': {
+            serverMessageHandler( parsedData )
+        },
+        case 'local': { },
+    }
 
     if ( type === 'player-login' ) {
         const { playerName } = parsedData;
@@ -67,10 +48,10 @@ function handleIncomingData( data, ws ) {
     const player = players[ playerUID ];
     const [ cmd, ...params ] = command.split( " " );
 
-    if ( cmd === 'chat' ) {
-        const chatString = `[chat]${ player.name }> "${ params.join( " " ) }"`
-        chat.send( chatString )
-    }
+    // if ( cmd === 'chat' ) {
+    //     const chatString = `[chat]${ player.name }> "${ params.join( " " ) }"`
+    //     chat.send( chatString )
+    // }
 
     if ( cmd === 'say' ) {
         const roomID = player.roomID;
@@ -95,17 +76,19 @@ function connectClient( ws ) {
     const isOpen = client => client !== ws && client.readyState === WebSocket.OPEN;
 
     console.log( 'client connected' )
+    globalBroadcast( 'A player has connected.' )
+    
 
-    wss.clients.forEach( client => {
-        if ( isOpen( client ) ) {
-            const eventString = `A player has logged in.`
-            client.send( JSON.stringify( {
-                scope: 'global',
-                type: 'event',
-                content: eventString,
-            } ) )
-        }
-    } )
+    // Get character name from user
+    // Find player data matching given name
+    // if found
+    // Create a player instance with data
+    // load player into zone/room saved in player data
+    // else
+    // create new character
+
+
+
 
     ws.on( 'message', data => handleIncomingData( data, ws ) )
 }
@@ -114,3 +97,12 @@ server.listen( PORT, () => {
     console.log( `Server up on port ${ PORT }.` )
 } )
 
+function globalBroadcast( data ) {
+    wss.clients.forEach( client => {
+        const message = JSON.stringify( {
+            scope: 'global',
+            type: 'event',
+            content: data,
+        })
+    })
+}

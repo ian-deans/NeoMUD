@@ -1,66 +1,43 @@
-const { v4: uuid } = require( 'uuid' );
-const EventEmitter = require('events');
+import { v4 as uuidv4 } from 'uuid';
 
-class Actor {
-    uid: string;
+/**
+ * Actor is the base class for all characters and creatures 
+ * in the game. From actual players to killer bunny rabbits
+ */
+
+
+export default class Actor {
+    uuid: string;
     name: string;
     shortDescription: string;
     longDescription: string;
-    location: Coordinates;
+    room_uid: string;
+    zone_uid: string;
 
-    constructor( { uid, name, shortDescription, longDescription } ) {
-        this.uid = uid ? uid : uuid()
-        this.name = name
-        this.shortDescription = shortDescription
-        this.longDescription = longDescription
-        // this.location = new Coordinates();
+    constructor( { uuid, name, shortDescription, longDescription } ) {
+        this.uuid = uuid ? uuid : uuidv4();
+        this.name = name;
+        this.shortDescription = shortDescription;
+        this.longDescription = longDescription;
     }
 
-    updateLocation(coords: ICoordinates) {
-        // this.location.update(coords)
+    updateLocation( { zone_uid, room_uid }: ILocation ) {
+        this.room_uid = room_uid;
+        this.zone_uid = zone_uid;
     }
 
     getLocation() {
-        return this.location
-    }
-
-    say( content ) {
-        // this.location.events.emit( 'say', { speaker: this.uid, content } )
+        return [ this.zone_uid, this.room_uid ];
     }
 }
 
-module.exports = Actor
 
+/**
+ * Interface for Actor locations 
+ * [ zone_uid, room_uid ]
+ */
 
-interface ICoordinates {
-    zoneUid: string;
-    roomUid: string;
+interface ILocation {
+    zone_uid: string;
+    room_uid: string;
 }
-
-// Represents an item or actors location in the world.
-// the first value is the zone uid, and the second is the room uid
-//  Coordinates [ a4fd-24h3, b3a5-9f93 ] = [ zoneUid, roomUid ]
-/*
-class Coordinates {
-    private zoneUid: string;
-    private roomUid: string;
-    private events: EventEmitter;
-    
-    constructor({ zoneUid = null, roomUid = null, events = null }: ICoordinates) {
-        this.zoneUid = zoneUid;
-        this.roomUid = roomUid;
-
-    }
-
-    update({zoneUid, roomUid}: ICoordinates) {
-        this.zoneUid = zoneUid;
-        this.roomUid = roomUid;
-    }
-
-    get() {
-        return [ this.zoneUid, this.roomUid ]
-    }
-}
-*/
-
-// game.zones[ coords[ 0 ] ].rooms[ coords[ 1 ]]

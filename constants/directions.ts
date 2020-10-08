@@ -1,8 +1,8 @@
-export enum Direction {
-    north = 'NORTH',
-    east = 'EAST',
-    south = 'SOUTH',
-    west = 'WEST',
-    up = 'UP',
-    down = 'DOWN',
+export enum Directions {
+    NORTH = 'NORTH',
+    EAST = 'EAST',
+    SOUTH = 'SOUTH',
+    WEST = 'WEST',
+    UP = 'UP',
+    DOWN = 'DOWN',
 }
