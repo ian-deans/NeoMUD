@@ -21,12 +21,12 @@ export default class Actor {
         this.longDescription = longDescription;
     }
 
-    updateLocation( { zone_uid, room_uid }: ILocation ) {
+    updateLocation( { zone_uid, room_uid } ): void {
         this.room_uid = room_uid;
         this.zone_uid = zone_uid;
     }
 
-    getLocation() {
+    getLocation(): Array<string> {
         return [ this.zone_uid, this.room_uid ];
     }
 }
@@ -36,8 +36,3 @@ export default class Actor {
  * Interface for Actor locations 
  * [ zone_uid, room_uid ]
  */
-
-interface ILocation {
-    zone_uid: string;
-    room_uid: string;
-}

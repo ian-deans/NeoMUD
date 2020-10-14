@@ -52,9 +52,8 @@ export default class Game {
         this.globalEvent = new EventEmitter()
         this.chat = new Channel( 'chat' )
 
-        process.on( 'error', function ( { message } ) {
-            console.error( message )
-        } )
+        this.start = this.start.bind( this )
+        this.listenTo = this.listenTo.bind( this )
     }
 
     addZone( zoneData ) {
@@ -95,5 +94,9 @@ export default class Game {
 
     getPlayer( uuid ) {
         return this.players[ uuid ];
+    }
+
+    listenTo( { event, cb } ) {
+        this.globalEvent.on( event, cb )
     }
 }

@@ -6,11 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node dist/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "http:up": "node dist/server.js",
+    "game:up": "node dist/game_server.js",
+    "client": "node dist/client.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "uuid": "^8.3.0",
     "websocket": "^1.0.32",

@@ -1,79 +1,87 @@
-import { client as WebSocketClient } from 'websocket';
-import { v4 as uid } from 'uuid';
+require( 'dotenv' ).config()
+import WebSocket from 'ws'
 
-const [ , , playerName = 'Ian' ] = process.argv;
 
-const client = new WebSocketClient()
-const _clientID = uid();
+class GameClient {
+    clientID: string | null
+    ws: any
 
-let _playerUID;
+    constructor() {
+        this.clientID = null
+        this.ws = new WebSocket( process.env.SERVER_URL )
 
-function _socketData( { playerUid, } ) {
-    return JSON.stringify( {
+        this.handleIncomingMessage = this.handleIncomingMessage.bind( this )
+        this.sendMessageToServer = this.sendMessageToServer.bind( this )
+        this.handleError = this.handleError.bind( this )
+        this.handleOpen = this.handleOpen.bind( this )
+        this.handleClose = this.handleClose.bind( this )
+        this.attachListeners = this.attachListeners.bind( this )
 
-    })
+        this.attachListeners()
+
+
+        process.stdin.on( 'data', data => {
+            const command = data.toString().trim()
+
+            if ( !this.clientID ) {
+                console.error( 'No ID received from server.' )
+            } else {
+
+
+                const messageData = {
+                    clientID: this.clientID,
+                    type: 'command',
+                    content: command,
+                }
+
+                this.sendMessageToServer( messageData );
+            }
+        } )
+
+    }
+
+    attachListeners() {
+        this.ws.on( 'message', this.handleIncomingMessage )
+        this.ws.on( 'error', this.handleError )
+        this.ws.on( 'open', this.handleOpen )
+        this.ws.on( 'close', this.handleClose )
+    }
+
+    handleClose() {
+        console.info( 'Connection to game server terminated.' )
+        process.exit()
+    }
+
+    handleOpen() {
+        console.info( 'Connection with server established at ' + process.env.SERVER_URL )
+    }
+
+    handleError( err ) {
+        console.info( 'Error received from server.' )
+        console.error( err )
+    }
+
+    handleIncomingMessage( message ) {
+        console.log( 'Message received from http server.' )
+
+        const data = JSON.parse( message )
+        console.log( data )
+
+        if ( data.type === 'connection_handshake' ) {
+            console.info( 'ID received from server: ' + data.content )
+            this.clientID = data.content
+        } else {
+            console.info( 'other command' )
+        }
+    }
+
+    sendMessageToServer( message ) {
+        console.info( 'Sending message to server: ' )
+        console.log( message )
+        this.ws.send( JSON.stringify( message ) )
+    }
+
 }
 
 
-client.on( 'connectFailed', function ( error ) {
-    console.log( 'Connect Error: ' + error.toString() );
-} );
-
-client.on( 'connect', function ( connection ) {
-    console.log( 'Connected to server...' );
-
-
-    connection.send( JSON.stringify( {
-        type: 'player-login',
-        playerName,
-        clientID: _clientID,
-    }))
-
-    connection.on( 'error', function ( error ) {
-        console.log( "Connection Error: " + error.toString() );
-    } );
-    connection.on( 'close', function () {
-        console.log( 'echo-protocol Connection Closed' );
-        process.exit()
-    } );
-
-    connection.on( 'message', function ( message ) {
-        if ( message.type === 'utf8' ) {
-
-            const data = JSON.parse( message.utf8Data.toString() )
-            const { clientID, type, content, } = data;
-
-            if ( type === 'player-login' ) {
-                const { playerUID } = data;
-                _playerUID = playerUID;
-                return
-            }
-            
-            if ( type === 'communication' ) {
-                console.log(content)
-            }
-            
-        }
-    } );
-
-    // const data = JSON.stringify( { tag: 'chat', content: 'This is a message' } )
-
-    // connection.send( data )
-
-
-    process.stdin.on( 'data', data => {
-        const command = data.toString().trim();
-
-        const socketData = {
-            clientID: _clientID,
-            playerUID: _playerUID,
-            command
-        }
-
-        connection.send( JSON.stringify( socketData ) )
-
-
-    } )
-} );
-
-client.connect( 'ws://localhost:5000/', 'echo-protocol' );
+const client = new GameClient()

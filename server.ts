@@ -1,108 +1,218 @@
-import express from 'express';
-import http from 'http';
-import WebSocket from 'ws';
-import Game from './src/Game';
+require( 'dotenv' ).config()
+import express from 'express'
+import http from 'http'
+import WebSocket from 'ws'
+import { v4 as uuidv4 } from 'uuid'
+import { createConnection } from 'net'
 
-process.title = 'Game Alpha';
+process.title = 'http_ws_server'
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+class HttpServer {
+    HTTP_PORT: number
+    GAME_PORT: number
+    wsClients: any
+    httpServer: any
+    wsServer: any
+    gameServer: any
 
-const server = http.createServer( app );
-const wss = new WebSocket.Server( { server } );
+    constructor() {
+        this.HTTP_PORT = parseInt( process.env.WEB_SOCKET_SERVER_PORT )
+        this.GAME_PORT = parseInt( process.env.GAME_SERVER_PORT )
+        this.wsClients = {}
 
-function serverMessageHandler( data ) {
-    if ( data.type === 'player-login' ) {
-        
-    }
-}
+        this.setup = this.setup.bind( this )
+        this.start = this.start.bind( this )
+        this.attachListeners = this.attachListeners.bind( this )
 
-wss.on( 'connection', connectClient )
+        this.connectWSClient = this.connectWSClient.bind( this )
+        this.handshakeWSClient = this.handshakeWSClient.bind( this )
+        this.sendToWSClient = this.sendToWSClient.bind( this )
 
-function handleIncomingData( data, ws ) {
+        this.routeFromClientToGame = this.routeFromClientToGame.bind( this )
+        this.routeFromGameToWSClient = this.routeFromGameToWSClient.bind( this )
+        this.getWSClient = this.getWSClient.bind( this )
+        this.addWSClient = this.addWSClient.bind( this )
 
-    const parsedData = JSON.parse( data.toString() )
-    const { scope, type, clientID } = JSON.parse( data.toString() );
 
-    switch ( scope ) {
-        case 'global': {
-            serverMessageHandler( parsedData )
-        },
-        case 'local': { },
-    }
-
-    if ( type === 'player-login' ) {
-        const { playerName } = parsedData;
-        const player = Object.values( players ).find( player => player.name === playerName )
-        players[ player.uid ].clientID = clientID;
-        players[ player.uid ].socket = ws;
-        ws.send( JSON.stringify( {
-            type: 'player-login',
-            playerUID: player.uid,
-        } ) )
-        return
+        this.setup()
     }
 
-
-    const { command, playerUID } = parsedData;
-    const player = players[ playerUID ];
-    const [ cmd, ...params ] = command.split( " " );
-
-    // if ( cmd === 'chat' ) {
-    //     const chatString = `[chat]${ player.name }> "${ params.join( " " ) }"`
-    //     chat.send( chatString )
-    // }
-
-    if ( cmd === 'say' ) {
-        const roomID = player.roomID;
-        const sayString = `${ player.name } says, "${ params.join( " " ) }"`
-
-        // global.players[player.uid].location.emit('say', 'stuff')
-        const returnData = JSON.stringify( {
-            clientID,
-            type: 'communication',
-            content: sayString,
+    setup() {
+        this.gameServer = createConnection( { port: this.GAME_PORT }, () => {
+            console.info( `Connection to game server established on port ${ this.GAME_PORT }` )
         } )
 
-        Object.values( players )
-            .filter( player => player.roomID === roomID )
-            .filter( player => player.socket !== null )
-            .forEach( playerInRoom => playerInRoom.socket.send( returnData ) )
+        const app = express()
+        this.httpServer = http.createServer( app )
+        this.wsServer = new WebSocket.Server( { server: this.httpServer } )
+        
+        this.attachListeners()
 
     }
-}
 
-function connectClient( ws ) {
-    const isOpen = client => client !== ws && client.readyState === WebSocket.OPEN;
+    attachListeners() {
+        this.gameServer.on( 'data', this.routeFromGameToWSClient )
 
-    console.log( 'client connected' )
-    globalBroadcast( 'A player has connected.' )
-    
+        this.wsServer.on( 'connection', this.connectWSClient )
+    }
 
-    // Get character name from user
-    // Find player data matching given name
-    // if found
-    // Create a player instance with data
-    // load player into zone/room saved in player data
-    // else
-    // create new character
+    start() {
+        this.httpServer.listen( this.HTTP_PORT, () =>
+            console.info( `Http Server is listening on port ${ this.HTTP_PORT }` ) )
+    }
 
+    routeFromGameToWSClient( data ) {
+        console.info( 'Received message from game server.' )
 
+        const parsedData = JSON.parse( data.toString().trim() )
+        console.log( parsedData )
 
+        const { clientID } = parsedData
+        this.sendToWSClient( { clientID, message: parsedData } )
+    }
 
-    ws.on( 'message', data => handleIncomingData( data, ws ) )
-}
+    connectWSClient( ws ) {
+        const clientID = uuidv4();
+        this.addWSClient( { clientID, client: ws } )
 
-server.listen( PORT, () => {
-    console.log( `Server up on port ${ PORT }.` )
-} )
+        console.log( `New client connected and assigned ID: ${ clientID }` )
+        this.handshakeWSClient( { clientID } )
+        // comepleteConnectionWithClient( { clientID, connection: ws } )
+        ws.on( 'message', this.routeFromClientToGame )
+    }
 
-function globalBroadcast( data ) {
-    wss.clients.forEach( client => {
-        const message = JSON.stringify( {
+    handshakeWSClient( { clientID } ) {
+        const message = {
+            clientID,
             scope: 'global',
-            type: 'event',
-            content: data,
-        })
-    })
+            type: 'connection_handshake',
+            content: clientID,
+        }
+        console.log( 'Handshaking with client...' )
+        this.sendToWSClient( { clientID, message } )
+    }
+
+    routeFromClientToGame( data ) {
+        console.info( 'Message received from client.' )
+        console.log( data )
+
+        console.info( 'Sending message to game server...' )
+        this.gameServer.write( data )
+    }
+
+    sendToWSClient( { clientID, message } ) {
+        const client = this.getWSClient( { clientID } )
+        //FIXME: Also validate the message data here too
+        client.send( JSON.stringify( message ) );
+    }
+
+    getWSClient( { clientID } ) {
+        const client = this.wsClients[ clientID ]
+        if ( client ) {
+            return client
+        } else {
+            throw new Error( `No client with ID ${ clientID } found.` )
+        }
+    }
+
+    addWSClient( { clientID, client } ) {
+        console.log( 'Adding client with ID ' + clientID )
+        this.wsClients[ clientID ] = client;
+    }
+
 }
+
+const httpServer = new HttpServer()
+httpServer.start()
+
+
+// const HTTP_PORT = process.env.WEB_SOCKET_SERVER_PORT || 5000
+// const GAME_PORT = process.env.GAME_SERVER_PORT
+// const clients = {}
+
+// const app = express()
+// const httpServer = http.createServer( app )
+// const wss = new WebSocket.Server( { server: httpServer } )
+
+// const gameServer = createConnection( { port: parseInt( GAME_PORT ) }, () => {
+//     console.log( 'Connection to game server esablished on port ' + GAME_PORT )
+// } )
+
+// gameServer.write( JSON.stringify( {
+//     scope: 'global',
+//     type: 'test',
+//     content: 'TESTING'
+// } ) )
+
+// gameServer.on( 'data', function ( data ) {
+//     const parsedData = JSON.parse( data.toString().trim() )
+//     console.info( 'Received message from game server.' )
+//     console.log( parsedData )
+//     const client = clients[ parsedData.clientID ]
+//     if ( client ) {
+//         console.info( 'Sending to client ' + parsedData.clientID )
+//         client.send( data )
+//     }
+// } )
+
+// wss.on( 'connection', function connectClient( ws ) {
+//     const isOpen = client => client !== ws && client.readyState === WebSocket.OPEN
+//     const clientID = uuidv4()
+
+//     addClient( { clientID, connection: ws } )
+//     console.log( `New client connected and assigned ID: ${ clientID }` )
+//     comepleteConnectionWithClient( { clientID, connection: ws } )
+
+//     ws.on( 'message', data => handleIncomingData( data, ws ) )
+// } )
+
+// function 
+
+// function connectClient( ws ) {
+//     const isOpen = client => client !== ws && client.readyState === WebSocket.OPEN
+
+//     const clientID = uuidv4()
+//     ws.name = clientID
+
+//     addClient( { clientID, connection: ws } )
+//     console.log( `New client connected and assigned ID: ${ clientID }` )
+//     comepleteConnectionWithClient( { clientID, connection: ws } )
+
+//     ws.on( 'message', data => handleIncomingData( data, ws ) )
+// }
+
+// // UTILITIES
+// function globalBroadcast( data ) {
+//     wss.clients.forEach( client => {
+//         const message = JSON.stringify( {
+//             scope: 'global',
+//             type: 'event',
+//             content: data,
+//         } )
+//     } )
+// }
+
+// function addClient( { clientID, connection } ) {
+//     clients[ clientID ] = connection
+// }
+
+// function getClientConnection( { clientID } ) {
+//     const client = clients[ clientID ]
+//     if ( !client ) {
+//         console.error( `No client connection found with clientID: ${ clientID }` )
+//     }
+// }
+
+// function comepleteConnectionWithClient( { clientID, connection } ) {
+//     const message = JSON.stringify( {
+//         scope: 'global',
+//         type: 'connection_handshake',
+//         content: clientID,
+//     } )
+//     connection.send( message )
+// }
+
+
+// httpServer.listen( HTTP_PORT, () => {
+//     console.log( `Server up on port ${ HTTP_PORT }.` )
+// } )
