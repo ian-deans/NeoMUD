@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node dist/server.js",
     "build": "tsc",
-    "http:up": "node dist/server.js",
-    "game:up": "node dist/game_server.js",
+    "http:up": "node dist/httpServer.js",
+    "game:up": "node dist/gameServer.js",
     "client": "node dist/client.js"
   },
   "author": "",

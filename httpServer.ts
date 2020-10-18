@@ -5,7 +5,12 @@ import WebSocket from 'ws'
 import { v4 as uuidv4 } from 'uuid'
 import { createConnection } from 'net'
 
+import config from './config/config'
+const { HTTP_PORT, GAME_PORT } = config;
+
 process.title = 'http_ws_server'
+
+const BASE10 = 10
 
 class HttpServer {
     HTTP_PORT: number
@@ -16,8 +21,8 @@ class HttpServer {
     gameServer: any
 
     constructor() {
-        this.HTTP_PORT = parseInt( process.env.WEB_SOCKET_SERVER_PORT )
-        this.GAME_PORT = parseInt( process.env.GAME_SERVER_PORT )
+        this.HTTP_PORT = HTTP_PORT
+        this.GAME_PORT = GAME_PORT
         this.wsClients = {}
 
         this.setup = this.setup.bind( this )
@@ -33,7 +38,6 @@ class HttpServer {
         this.getWSClient = this.getWSClient.bind( this )
         this.addWSClient = this.addWSClient.bind( this )
 
-
         this.setup()
     }
 
@@ -45,14 +49,12 @@ class HttpServer {
         const app = express()
         this.httpServer = http.createServer( app )
         this.wsServer = new WebSocket.Server( { server: this.httpServer } )
-        
-        this.attachListeners()
 
+        this.attachListeners()
     }
 
     attachListeners() {
         this.gameServer.on( 'data', this.routeFromGameToWSClient )
-
         this.wsServer.on( 'connection', this.connectWSClient )
     }
 
@@ -124,95 +126,3 @@ class HttpServer {
 
 const httpServer = new HttpServer()
 httpServer.start()
-
-
-// const HTTP_PORT = process.env.WEB_SOCKET_SERVER_PORT || 5000
-// const GAME_PORT = process.env.GAME_SERVER_PORT
-// const clients = {}
-
-// const app = express()
-// const httpServer = http.createServer( app )
-// const wss = new WebSocket.Server( { server: httpServer } )
-
-// const gameServer = createConnection( { port: parseInt( GAME_PORT ) }, () => {
-//     console.log( 'Connection to game server esablished on port ' + GAME_PORT )
-// } )
-
-// gameServer.write( JSON.stringify( {
-//     scope: 'global',
-//     type: 'test',
-//     content: 'TESTING'
-// } ) )
-
-// gameServer.on( 'data', function ( data ) {
-//     const parsedData = JSON.parse( data.toString().trim() )
-//     console.info( 'Received message from game server.' )
-//     console.log( parsedData )
-//     const client = clients[ parsedData.clientID ]
-//     if ( client ) {
-//         console.info( 'Sending to client ' + parsedData.clientID )
-//         client.send( data )
-//     }
-// } )
-
-// wss.on( 'connection', function connectClient( ws ) {
-//     const isOpen = client => client !== ws && client.readyState === WebSocket.OPEN
-//     const clientID = uuidv4()
-
-//     addClient( { clientID, connection: ws } )
-//     console.log( `New client connected and assigned ID: ${ clientID }` )
-//     comepleteConnectionWithClient( { clientID, connection: ws } )
-
-//     ws.on( 'message', data => handleIncomingData( data, ws ) )
-// } )
-
-// function 
-
-// function connectClient( ws ) {
-//     const isOpen = client => client !== ws && client.readyState === WebSocket.OPEN
-
-//     const clientID = uuidv4()
-//     ws.name = clientID
-
-//     addClient( { clientID, connection: ws } )
-//     console.log( `New client connected and assigned ID: ${ clientID }` )
-//     comepleteConnectionWithClient( { clientID, connection: ws } )
-
-//     ws.on( 'message', data => handleIncomingData( data, ws ) )
-// }
-
-// // UTILITIES
-// function globalBroadcast( data ) {
-//     wss.clients.forEach( client => {
-//         const message = JSON.stringify( {
-//             scope: 'global',
-//             type: 'event',
-//             content: data,
-//         } )
-//     } )
-// }
-
-// function addClient( { clientID, connection } ) {
-//     clients[ clientID ] = connection
-// }
-
-// function getClientConnection( { clientID } ) {
-//     const client = clients[ clientID ]
-//     if ( !client ) {
-//         console.error( `No client connection found with clientID: ${ clientID }` )
-//     }
-// }
-
-// function comepleteConnectionWithClient( { clientID, connection } ) {
-//     const message = JSON.stringify( {
-//         scope: 'global',
-//         type: 'connection_handshake',
-//         content: clientID,
-//     } )
-//     connection.send( message )
-// }
-
-
-// httpServer.listen( HTTP_PORT, () => {
-//     console.log( `Server up on port ${ HTTP_PORT }.` )
-// } )

@@ -68,12 +68,20 @@ export default class Game {
     }
 
     start() {
+        const globalEvent = this.globalEvent 
         this.active = true
-        while ( this.active ) {
-            this.tickInterval = setInterval( function () {
-                this.globalEvent.emit( 'tick', { time: new Date() } )
-            }, this.tickLength )
-        }
+        this.tickInterval = setInterval( function () {
+            let count = 0;
+            globalEvent.emit( 'tick', { time: new Date(), count } )
+            count++
+        }, this.tickLength )
+
+
+        this.globalEvent.on( 'tick', ( { time, count } ) => {
+            console.log( `Tick #${ count } - ${ time }` )
+        } )
+        // while ( this.active ) {
+        // }
     }
 
     activate() {

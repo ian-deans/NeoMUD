@@ -1,6 +1,7 @@
 require( 'dotenv' ).config()
 import net from 'net';
 import Game from './src/Game'
+import config from './config/config';
 
 class GameServer {
     server: any;
@@ -11,7 +12,7 @@ class GameServer {
 
     constructor() {
         this.game = new Game( {} );
-        this.port = parseInt( process.env.GAME_SERVER_PORT );
+        this.port = config.GAME_PORT;
         this.httpServers = []
 
         this.addHttpServer = this.addHttpServer.bind( this )
@@ -76,10 +77,21 @@ class GameServer {
     }
 
     start() {
-        console.log('Starting Game...')
-        // this.game.start()
+        console.log( 'Starting Game...' )
+        this.game.start()
 
-        console.log('PORT ', this)
+        this.game.globalEvent.on( 'tick', data => {
+            const message = {
+                scope: 'global',
+                type: 'tick',
+                content: data,
+            }
+            console.info( 'Broadcasting Tick' )
+            this.broadcast( message )
+        } )
+
+        console.log( 'PORT ', this.port )
+
         this.server.listen( this.port, () => {
             console.log( 'Game server started on port ' + this.port )
         } )
