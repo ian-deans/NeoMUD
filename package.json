@@ -22,10 +22,19 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.1",
+    "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
     "@types/websocket": "^1.0.1",
     "@types/ws": "^7.2.7",
+    "jest": "^26.5.3",
+    "module-alias": "^2.2.2",
+    "ts-jest": "^26.4.1",
     "tslint": "^6.1.3",
     "typescript": "^4.0.3"
+  },
+  "_moduleAliases": {
+    "@common": "dist/common",
+    "@components": "dist/server/src/components",
+    "@saved": "dist/server/src/saved"
   }
 }

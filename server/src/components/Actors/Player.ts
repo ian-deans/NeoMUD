@@ -1,5 +1,5 @@
 import { Socket } from "net";
-import Actor from "./Actor";
+import Actor from "@components/Actors/Actor";
 
 /**
  * Class that handles Players and how they can interact with the game.

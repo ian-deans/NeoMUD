@@ -1,5 +1,5 @@
-import { Directions } from '../constants/directions';
-import { IMessage } from '../src/interfaces';
+import { Directions } from '@common/directions';
+import { IMessage } from '@common/interfaces';
 
 export function directionOppositeOf( direction: Directions ): string {
     switch ( direction ) {

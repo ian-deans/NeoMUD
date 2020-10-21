@@ -1,14 +1,15 @@
 require( 'dotenv' ).config()
-import net from 'net';
-import Game from './src/Game'
-import config from './config/config';
+import * as net from 'net';
+import Game from '@components/Game'
+import config from '@common/config';
+import { IMessage, ITick } from '@common/interfaces'
 
 class GameServer {
-    server: any;
+    server: net.Server;
     port: number;
-    game: any;
-    httpServers: any;
-    connections: any[];
+    game: Game;
+
+    httpServers: net.Socket[];
 
     constructor() {
         this.game = new Game( {} );
@@ -16,6 +17,7 @@ class GameServer {
         this.httpServers = []
 
         this.addHttpServer = this.addHttpServer.bind( this )
+        this.remHttpServer = this.remHttpServer.bind( this )
         this.broadcast = this.broadcast.bind( this )
         this.setup = this.setup.bind( this )
         this.start = this.start.bind( this )
@@ -25,11 +27,21 @@ class GameServer {
             console.log( `TCP Socket connection opened.` )
             this.addHttpServer( socket );
 
+            socket.on( 'open', () => {
+                console.log( `TCP Socket connection made.` )
+            } )
+
+            socket.on( 'close', () => {
+                console.log( 'Connection closed.' )
+                this.remHttpServer( socket )
+            } )
+
             // on message from http/ws server
-            socket.on( 'data', data => {
-                const message = GameServer._parsedData( data );
-                const { scope, clientID, type, content } = message;
+            socket.on( 'data', ( data: Buffer ) => {
                 console.info( 'Message received from http server.' )
+
+                const message: IMessage = GameServer._parsedData( data );
+                const { scope, clientID } = message;
 
                 const scopeIsGlobal = scope === 'global';
                 if ( scopeIsGlobal ) {
@@ -41,21 +53,23 @@ class GameServer {
                 console.log( message )
 
                 console.info( 'Sending message to http server...' )
-                const responseData = { clientID, type: 'test', content: 'Server receieved message.' }
+                const responseData = {
+                    clientID,
+                    scope: 'global',
+                    type: 'test',
+                    content: 'Server receieved message.'
+                }
 
                 this.broadcast( responseData )
             } )
         } ).on( 'error', error => {
             console.error( error )
         } )
-
-        // this.setup()
-
     }
 
-    setup() {
+    setup(): void {
         this.game.listenTo( {
-            event: 'tick', cb: function () {
+            event: 'tick', cb: () => {
                 const data = {
                     scope: 'global',
                     type: 'tick',
@@ -63,45 +77,50 @@ class GameServer {
                 this.broadcast( data )
             }
         } )
-
-
     }
 
-    broadcast( data ) {
-        const message = JSON.stringify( data )
-        this.httpServers.forEach( socket => socket.write( message ) )
+    broadcast( data: IMessage ): void {
+        const messageJSON: string = JSON.stringify( data )
+        this.httpServers.forEach( (socket: net.Socket ) => {
+            const socketIsWritable: boolean = socket.writable
+
+            if ( socketIsWritable ) {
+                socket.write( messageJSON )
+            }
+        } )
     }
 
-    addHttpServer( socket ) {
+    remHttpServer( socket: net.Socket ): void {
+        this.httpServers = this.httpServers.filter( server => server !== socket )
+    }
+
+    addHttpServer( socket: net.Socket ): void {
         this.httpServers.push( socket )
     }
 
-    start() {
+    start(): void {
         console.log( 'Starting Game...' )
         this.game.start()
 
-        this.game.globalEvent.on( 'tick', data => {
-            const message = {
+        this.game.globalEvent.on( 'tick', (tickData: ITick) => {
+            const message: IMessage = {
                 scope: 'global',
                 type: 'tick',
-                content: data,
+                content: tickData,
             }
             console.info( 'Broadcasting Tick' )
             this.broadcast( message )
         } )
-
-        console.log( 'PORT ', this.port )
 
         this.server.listen( this.port, () => {
             console.log( 'Game server started on port ' + this.port )
         } )
     }
 
-    static _parsedData( data ) {
+    static _parsedData( data: Buffer ): IMessage {
         return JSON.parse( data.toString().trim() )
     }
 }
-
 
 const gameServer = new GameServer();
 

@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
-import Room from './Room';
-import { Directions } from '../constants/directions';
-import { directionOppositeOf } from '../util'
+import Room from '@components/Zone';
+import { Directions } from '@common/directions';
+import { directionOppositeOf } from '@common/utils'
+
 
 
 interface IZone {

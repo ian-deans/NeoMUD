@@ -1,11 +1,25 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "esModuleInterop": true,
-      "target": "es6",
-      "moduleResolution": "node",
-      "sourceMap": true,
-      "outDir": "dist"
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": "./",
+    "paths": {
+      "@common/*": [
+        "common/*"
+      ],
+      "@components/*": [
+        "server/src/components/*"
+      ],
+      "@saved/*": [
+        "server/src/saved/*"
+      ],
     },
-    "lib": ["es2015"]
-  }
+  },
+  "lib": [
+    "es2015"
+  ],
+}

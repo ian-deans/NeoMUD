@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Item is the base for any object such as potions, weapons, 
@@ -8,16 +8,20 @@ import { v4 as uuid } from 'uuid';
 
 
 export default class Item {
-    uid: string;
-    item_id: string;    // The uuid of the base model entry
+    uuid: string;
+    itemId: string;    // The uuid of the base model entry
     name: string;
     shortDescription: string;   // The description displayed in rooms ("A rusted sword lies here.")
     longDescription: string;    // Description for when item is inspected.
 
     constructor({ name, shortDescription, longDescription }) {
-        this.uid =  uuid()
+        this.uuid =  uuidv4()
         this.name = name
         this.shortDescription = shortDescription
         this.longDescription = longDescription
     }
 }
+
+/**
+ * 
+ */

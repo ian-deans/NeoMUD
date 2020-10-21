@@ -1,5 +1,5 @@
-const rGAME_PORT: number | string = process.env.GAME_PORT
-const rHTTP_PORT: string | number = process.env.HTTP_PORT
+const rGAME_PORT: number | string = process.env.GAME_PORT || 5050
+const rHTTP_PORT: string | number = process.env.HTTP_PORT || 5000
 
 let GAME_PORT: number;
 let HTTP_PORT: number;
@@ -24,5 +24,5 @@ export default {
     HTTP_PORT,
     // GAME_PORT: parseInt(process.env.GAME_PORT, 10) || 5050,
     GAME_PORT,
-    SERVER_URL: process.env.SERVER_URL || 'ws://localhost:5000',
+    SERVER_URL: process.env.SERVER_URL || 'ws://localhost',
 }

@@ -1,7 +1,12 @@
 export interface IMessage {
     type: string;   //TODO: replace with enums ( scope and type )
     scope: string;
-    clientID: string;
+    clientID?: string;
     playerUUID?: string;
     content?: any;
+}
+
+export interface ITick {
+    time: Date;
+    count: number;
 }

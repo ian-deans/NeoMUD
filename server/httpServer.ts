@@ -4,13 +4,18 @@ import http from 'http'
 import WebSocket from 'ws'
 import { v4 as uuidv4 } from 'uuid'
 import { createConnection } from 'net'
+import config from '@common/config'
 
-import config from './config/config'
+
 const { HTTP_PORT, GAME_PORT } = config;
 
 process.title = 'http_ws_server'
 
 const BASE10 = 10
+
+interface IClients {
+    [key: string]: WebSocket,
+}
 
 class HttpServer {
     HTTP_PORT: number
@@ -56,6 +61,7 @@ class HttpServer {
     attachListeners() {
         this.gameServer.on( 'data', this.routeFromGameToWSClient )
         this.wsServer.on( 'connection', this.connectWSClient )
+        // this.gameServer.on('close', this.closeConnection )
     }
 
     start() {
@@ -63,17 +69,28 @@ class HttpServer {
             console.info( `Http Server is listening on port ${ this.HTTP_PORT }` ) )
     }
 
-    routeFromGameToWSClient( data ) {
+    closeConnection() {
+        // this.w
+    }
+
+    routeFromGameToWSClient( data: Buffer ): void {
         console.info( 'Received message from game server.' )
+        console.log(data)
 
         const parsedData = JSON.parse( data.toString().trim() )
         console.log( parsedData )
 
-        const { clientID } = parsedData
-        this.sendToWSClient( { clientID, message: parsedData } )
+        const { scope, clientID } = parsedData
+        if ( scopeIsGlobal( scope ) ) {
+            Object.values( this.wsClients )
+                .forEach( ( client: WebSocket ): void =>
+                    client.send( data ) )
+        } else if ( clientID ) {
+            this.sendToWSClient( { clientID, message: parsedData } )
+        }
     }
 
-    connectWSClient( ws ) {
+    connectWSClient( ws: WebSocket ): void {
         const clientID = uuidv4();
         this.addWSClient( { clientID, client: ws } )
 
@@ -94,7 +111,7 @@ class HttpServer {
         this.sendToWSClient( { clientID, message } )
     }
 
-    routeFromClientToGame( data ) {
+    routeFromClientToGame( data: Buffer ) {
         console.info( 'Message received from client.' )
         console.log( data )
 
@@ -126,3 +143,8 @@ class HttpServer {
 
 const httpServer = new HttpServer()
 httpServer.start()
+
+
+function scopeIsGlobal( scope ) {
+    return scope === 'global'
+}

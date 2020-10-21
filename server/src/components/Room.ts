@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { EventEmitter } from 'events'
-import Channel from './Channel'
+import Channel from '@components/Channel'
 
 interface IRoom {
     uuid: string

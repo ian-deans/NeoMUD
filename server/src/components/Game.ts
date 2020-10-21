@@ -1,7 +1,9 @@
-import Zone from './Zone'
-import Player from "./Player"
+import Zone from '@components/Zone'
+import Player from "@components/Actors/Player"
 import { EventEmitter } from 'events'
-import Channel from './Channel'
+import Channel from '@components/Channel'
+import { ITick } from '@common/interfaces';
+
 
 
 /**
@@ -68,11 +70,13 @@ export default class Game {
     }
 
     start() {
-        const globalEvent = this.globalEvent 
+        const globalEvent = this.globalEvent
         this.active = true
-        this.tickInterval = setInterval( function () {
-            let count = 0;
-            globalEvent.emit( 'tick', { time: new Date(), count } )
+        let count = 0;
+
+        this.tickInterval = setInterval( () => {
+            const tickData: ITick = { time: new Date(), count }
+            globalEvent.emit( 'tick', tickData )
             count++
         }, this.tickLength )
 
