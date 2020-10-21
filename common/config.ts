@@ -21,18 +21,16 @@ function _gamePort(): number {
     return normalizePort( gamePort )
 }
 
-function _httpPort() {
+function _httpPort(): number {
     const port: string | number = process.env.HTTP_PORT || DEFAULT.HTTP_PORT
     console.log( typeof port, 'HTTP' )
     return normalizePort( port )
 }
 
-function normalizePort( port ) {
+function normalizePort( port: string | number ): number {
     if ( typeof port === 'string' ) {
         return parseInt( port, 10 )
     } else {
         return port
     }
 }
-
-

@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-
+import { IActorConfig } from '@common/interfaces'
 /**
  * Actor is the base class for all characters and creatures 
  * in the game. From actual players to killer bunny rabbits
@@ -7,27 +6,29 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 export default class Actor {
-    uuid: string;
-    name: string;
-    shortDescription: string;
-    longDescription: string;
-    room_uid: string;
-    zone_uid: string;
+    name: string
+    shortDescription: string
+    longDescription: string
+    roomUUID: string
+    zoneUUID: string
 
-    constructor( { uuid, name, shortDescription, longDescription } ) {
-        this.uuid = uuid ? uuid : uuidv4();
-        this.name = name;
-        this.shortDescription = shortDescription;
-        this.longDescription = longDescription;
+    constructor( { name, shortDescription, longDescription, zoneUUID, roomUUID }: IActorConfig ) {
+        this.name = name
+        this.shortDescription = shortDescription
+        this.longDescription = longDescription
+    
+        this.updateLocation = this.updateLocation.bind( this )
+        this.updateLocation({ zoneUUID, roomUUID })
     }
 
-    updateLocation( { zone_uid, room_uid } ): void {
-        this.room_uid = room_uid;
-        this.zone_uid = zone_uid;
+    updateLocation( { zoneUUID, roomUUID } ): void {
+        // TODO: Add error handlign for invalid room or zone uuids
+        this.roomUUID = roomUUID
+        this.zoneUUID = zoneUUID
     }
 
     getLocation(): Array<string> {
-        return [ this.zone_uid, this.room_uid ];
+        return [ this.zoneUUID, this.roomUUID ]
     }
 }
 

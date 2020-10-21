@@ -7,11 +7,11 @@ import { ITick } from '@common/interfaces';
 
 
 interface IZoneList {
-    [ zone_uid: string ]: typeof Zone
+    [ zoneUuid: string ]: typeof Zone
 }
 
 interface IPlayerList {
-    [ player_uid: string ]: typeof Player
+    [ playerUuid: string ]: typeof Player
 }
 
 /**
@@ -70,8 +70,6 @@ export default class Game {
         this.globalEvent.on( 'tick', ( { time, count } ) => {
             console.log( `Tick #${ count } - ${ time }` )
         } )
-        // while ( this.active ) {
-        // }
     }
 
     activate() {
