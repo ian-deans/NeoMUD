@@ -15,6 +15,8 @@ interface IRoom {
  */
 
 export default class Room {
+    private zoneUUID: string
+
     uuid: string
     title: string
     description: string
@@ -24,7 +26,8 @@ export default class Room {
     events: any
     respawnPoints: any[]
     say: any
-    
+    map: any
+
     constructor( { uuid, title, description }: IRoom ) {
         this.uuid = uuid ? uuid : uuidv4()
         this.title = title

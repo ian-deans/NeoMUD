@@ -1,3 +1,5 @@
+import Room from "@components/Room"
+
 export interface IMessage {
     type: string   //TODO: replace with enums ( scope and type )
     scope: string
@@ -17,4 +19,11 @@ export interface IActorConfig {
     longDescription: string
     roomUUID?: string
     zoneUUID?: string
+    location?: Room
+}
+
+export interface IPlayerConfig extends IActorConfig {
+    uuid: string
+    clientID: string
+
 }

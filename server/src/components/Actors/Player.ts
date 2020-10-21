@@ -1,5 +1,5 @@
-import { Socket } from "net";
-import Actor from "@components/Actors/Actor";
+import { Socket } from "net"
+import Actor from "@components/Actors/Actor"
 
 /**
  * Class that handles Players and how they can interact with the game.
@@ -9,20 +9,27 @@ import Actor from "@components/Actors/Actor";
  */
 
 export default class Player extends Actor {
-    clientID: string;
-    socket: Socket | null;
-    location: any;
+    uuid: string
+    clientID: string
 
     constructor( data ) {
-        super( data );
-        this.clientID = data.clientID;
-        this.socket = null;
+        super( data )
+        this.uuid = data.uuid
+        this.clientID = data.clientID
+    }
+
+    get location() {
+        return {
+            info: function () {
+                
+            }
+        }
     }
 
     look() {
         const { title, description, exits, occupants, objects } = this.location.info()
 
-        const roomOccupants = occupants.filter( occupant => occupant.uid !== this.uuid )
+        const roomOccupants = occupants.filter( occupant => occupant.uuid !== this.uuid )
         return console.log( `
  ${ title.toUpperCase() }
  ${ description }
