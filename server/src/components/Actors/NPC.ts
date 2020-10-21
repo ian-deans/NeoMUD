@@ -1,9 +1,7 @@
-const Actor = require('./Actor')
+import Actor from '@components/Actors/Actor'
 
-class NPC extends Actor {
+export default class NPC extends Actor {
     constructor( data ) {
         super( data )
     }
 }
-
-module.exports = NPC

@@ -1,28 +1,38 @@
-const rGAME_PORT: number | string = process.env.GAME_PORT || 5050
-const rHTTP_PORT: string | number = process.env.HTTP_PORT || 5000
 
-let GAME_PORT: number;
-let HTTP_PORT: number;
-
-console.log(typeof GAME_PORT, 'GAME')
-console.log(typeof HTTP_PORT, 'HTTP')
-
-if ( typeof rGAME_PORT === 'string' ) {
-    GAME_PORT = parseInt( rGAME_PORT, 10 )
-} else {
-    GAME_PORT = rGAME_PORT
-}
-
-if ( typeof rHTTP_PORT === 'string' ) {
-    HTTP_PORT = parseInt( rHTTP_PORT, 10 )
-} else {
-    HTTP_PORT = rHTTP_PORT
+const DEFAULT = {
+    GAME_PORT: 5050,
+    HTTP_PORT: 5000,
+    HTTP_URL: 'ws://localhost'
 }
 
 
-export default {
-    HTTP_PORT,
-    // GAME_PORT: parseInt(process.env.GAME_PORT, 10) || 5050,
-    GAME_PORT,
-    SERVER_URL: process.env.SERVER_URL || 'ws://localhost',
+export const GAME_PORT: number = _gamePort()
+export const HTTP_PORT: number = _httpPort()
+export const HTTP_URL: string = _serverUrl()
+
+
+function _serverUrl(): string {
+    return process.env.HTTP_URL || DEFAULT.HTTP_URL
 }
+
+function _gamePort(): number {
+    const gamePort: string | number = process.env.GAME_PORT || DEFAULT.GAME_PORT
+    console.log( typeof gamePort, 'GAME' )
+    return normalizePort( gamePort )
+}
+
+function _httpPort() {
+    const port: string | number = process.env.HTTP_PORT || DEFAULT.HTTP_PORT
+    console.log( typeof port, 'HTTP' )
+    return normalizePort( port )
+}
+
+function normalizePort( port ) {
+    if ( typeof port === 'string' ) {
+        return parseInt( port, 10 )
+    } else {
+        return port
+    }
+}
+
+

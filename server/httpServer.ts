@@ -1,13 +1,19 @@
 require( 'dotenv' ).config()
+import 'module-alias/register'
+
 import express from 'express'
 import http from 'http'
 import WebSocket from 'ws'
 import { v4 as uuidv4 } from 'uuid'
 import { createConnection } from 'net'
-import config from '@common/config'
+import { GAME_PORT, HTTP_PORT } from '@common/config'
 
-
-const { HTTP_PORT, GAME_PORT } = config;
+/**
+ * Acts as an entry point for clients to send data to the game server using WebSocket
+ * to communicate with clients and a TCP socket to communicate to the GameSever.
+ * Maintains a collection of the web socket connections and their client id to help
+ * direct data to the correct players/
+ */
 
 process.title = 'http_ws_server'
 

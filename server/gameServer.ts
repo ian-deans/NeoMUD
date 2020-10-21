@@ -1,8 +1,16 @@
 require( 'dotenv' ).config()
+import 'module-alias/register'
+
 import * as net from 'net';
 import Game from '@components/Game'
-import config from '@common/config';
+import { GAME_PORT } from '@common/config';
 import { IMessage, ITick } from '@common/interfaces'
+
+/**
+ * Hosts the Game program via a TCP socket on the GAME_PORT
+ * Directs data from clients to their player instances
+ */
+
 
 class GameServer {
     server: net.Server;
@@ -13,7 +21,7 @@ class GameServer {
 
     constructor() {
         this.game = new Game( {} );
-        this.port = config.GAME_PORT;
+        this.port = GAME_PORT;
         this.httpServers = []
 
         this.addHttpServer = this.addHttpServer.bind( this )

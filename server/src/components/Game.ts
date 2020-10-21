@@ -6,20 +6,6 @@ import { ITick } from '@common/interfaces';
 
 
 
-/**
- * get zone data from db
- * instantiate zones 
- *   instantiate rooms
- *      connect rooms' exits
- * 
- * get item data from db
- *  trigger respawn points in rooms to spawn items and NPCs
- * 
- * get player data from db
- *  await connections to instantiate player objects
- * 
- * 
- */
 interface IZoneList {
     [ zone_uid: string ]: typeof Zone
 }
@@ -112,3 +98,20 @@ export default class Game {
         this.globalEvent.on( event, cb )
     }
 }
+
+
+
+/**
+ * get zone data from db
+ * instantiate zones 
+ *   instantiate rooms
+ *      connect rooms' exits
+ * 
+ * get item data from db
+ *  trigger respawn points in rooms to spawn items and NPCs
+ * 
+ * get player data from db
+ *  await connections to instantiate player objects
+ * 
+ * 
+ */

@@ -7,9 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node dist/server.js",
     "build": "tsc",
-    "http:up": "node dist/httpServer.js",
-    "game:up": "node dist/gameServer.js",
-    "client": "node dist/client.js"
+    "gameUp": "npm run server:game:up",
+    "httpUp": "npm run server:http:up",
+    "server:http:up": "node dist/server/httpServer.js",
+    "server:game:up": "node dist/server/gameServer.js",
+    "client": "node dist/client/client.js"
   },
   "author": "",
   "license": "ISC",

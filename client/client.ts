@@ -1,5 +1,11 @@
 require( 'dotenv' ).config()
+import "module-alias/register"
 import WebSocket from 'ws'
+import { HTTP_PORT, HTTP_URL } from "@common/config"
+
+/**
+ * Client program for connecting to and interacting with the game
+ */
 
 
 class GameClient {
@@ -8,7 +14,7 @@ class GameClient {
 
     constructor() {
         this.clientID = null
-        this.ws = new WebSocket( process.env.SERVER_URL )
+        this.ws = new WebSocket( `${ HTTP_URL }:${ HTTP_PORT }` )
 
         this.handleIncomingMessage = this.handleIncomingMessage.bind( this )
         this.sendMessageToServer = this.sendMessageToServer.bind( this )
