@@ -1,6 +1,10 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  moduleNameMapper: {
+    "@components(.*)$": "<rootDir>/server/src/components/$1",
+    "@common(.*)$": "<rootDir>/common/$1"
+  },
   roots: [
     "<rootDir>/server/src",
     "<rootDir>/client"

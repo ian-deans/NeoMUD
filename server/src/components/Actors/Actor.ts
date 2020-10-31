@@ -27,8 +27,8 @@ export default class Actor {
         const roomIsValid = true //TODO: make this actually do something
         if ( roomIsValid ) {
             this.location = room
-            this.zoneUUID = room.getZoneUUID()
-            this.roomUUID = room.getUUID()
+            // this.zoneUUID = room.getZoneUUID()
+            // this.roomUUID = room.getUUID()
         } else {
             //TODO: do something else?
         }

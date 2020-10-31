@@ -1,5 +1,11 @@
 
-const DEFAULT = {
+interface IDefaults {
+    GAME_PORT: number
+    HTTP_PORT: number
+    HTTP_URL: string
+}
+
+const DEFAULT: IDefaults = {
     GAME_PORT: 5050,
     HTTP_PORT: 5000,
     HTTP_URL: 'ws://localhost'
@@ -17,13 +23,11 @@ function _serverUrl(): string {
 
 function _gamePort(): number {
     const gamePort: string | number = process.env.GAME_PORT || DEFAULT.GAME_PORT
-    console.log( typeof gamePort, 'GAME' )
     return normalizePort( gamePort )
 }
 
 function _httpPort(): number {
     const port: string | number = process.env.HTTP_PORT || DEFAULT.HTTP_PORT
-    console.log( typeof port, 'HTTP' )
     return normalizePort( port )
 }
 
